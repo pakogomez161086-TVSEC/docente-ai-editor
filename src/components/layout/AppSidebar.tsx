@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   BookOpen,
   CalendarDays,
+  CalendarRange,
   ClipboardList,
   LayoutDashboard,
   Library,
@@ -24,19 +25,22 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const principal = [{ title: "Inicio", url: "/dashboard", icon: LayoutDashboard }];
+type Item = { title: string; url: string; icon: typeof LayoutDashboard };
 
-const pedagogia = [
-  { title: "Proyectos de Aula", url: "/dashboard", icon: BookOpen },
-  { title: "IA Pedagógica", url: "/dashboard", icon: Sparkles },
-  { title: "Planeación", url: "/dashboard", icon: NotebookPen },
-  { title: "Sesiones", url: "/dashboard", icon: ClipboardList },
+const principal: Item[] = [{ title: "Inicio", url: "/dashboard", icon: LayoutDashboard }];
+
+const pedagogia: Item[] = [
+  { title: "Proyectos de Aula", url: "/proyectos", icon: BookOpen },
+  { title: "IA Pedagógica", url: "/ia", icon: Sparkles },
+  { title: "Planeaciones", url: "/planeaciones", icon: NotebookPen },
+  { title: "Sesiones", url: "/sesiones", icon: ClipboardList },
 ];
 
-const organizacion = [
-  { title: "Agenda Docente", url: "/dashboard", icon: CalendarDays },
-  { title: "Biblioteca", url: "/dashboard", icon: Library },
-  { title: "Administración", url: "/dashboard", icon: Settings },
+const organizacion: Item[] = [
+  { title: "Agenda Docente", url: "/agenda", icon: CalendarDays },
+  { title: "Calendario Escolar", url: "/calendario", icon: CalendarRange },
+  { title: "Biblioteca", url: "/biblioteca", icon: Library },
+  { title: "Administración", url: "/admin", icon: Settings },
 ];
 
 export function AppSidebar() {
@@ -44,14 +48,14 @@ export function AppSidebar() {
   const collapsed = state === "collapsed";
   const pathname = useRouterState({ select: (r) => r.location.pathname });
 
-  const renderGroup = (label: string, items: typeof principal) => (
-    <SidebarGroup>
+  const renderGroup = (label: string, items: Item[]) => (
+    <SidebarGroup key={label}>
       {!collapsed ? <SidebarGroupLabel>{label}</SidebarGroupLabel> : null}
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild isActive={pathname === item.url && item.title === "Inicio"}>
+              <SidebarMenuButton asChild isActive={pathname.startsWith(item.url)} tooltip={item.title}>
                 <Link to={item.url} className="flex items-center gap-2.5">
                   <item.icon className="h-4 w-4" />
                   {!collapsed && <span>{item.title}</span>}
