@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedPlaneacionesRouteImport } from './routes/_authenticated/planeaciones'
 import { Route as AuthenticatedProyectosRouteImport } from './routes/_authenticated/proyectos'
 
 const IndexRoute = IndexRouteImport.update({
@@ -34,6 +35,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPlaneacionesRoute =
+  AuthenticatedPlaneacionesRouteImport.update({
+    id: '/planeaciones',
+    path: '/planeaciones',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedProyectosRoute = AuthenticatedProyectosRouteImport.update({
   id: '/proyectos',
   path: '/proyectos',
@@ -44,12 +51,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/planeaciones': typeof AuthenticatedPlaneacionesRoute
   '/proyectos': typeof AuthenticatedProyectosRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/planeaciones': typeof AuthenticatedPlaneacionesRoute
   '/proyectos': typeof AuthenticatedProyectosRoute
 }
 export interface FileRoutesById {
@@ -58,19 +67,21 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/planeaciones': typeof AuthenticatedPlaneacionesRoute
   '/_authenticated/proyectos': typeof AuthenticatedProyectosRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard' | '/proyectos'
+  fullPaths: '/' | '/auth' | '/dashboard' | '/planeaciones' | '/proyectos'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/proyectos'
+  to: '/' | '/auth' | '/dashboard' | '/planeaciones' | '/proyectos'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/dashboard'
+    | '/_authenticated/planeaciones'
     | '/_authenticated/proyectos'
   fileRoutesById: FileRoutesById
 }
@@ -110,6 +121,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/planeaciones': {
+      id: '/_authenticated/planeaciones'
+      path: '/planeaciones'
+      fullPath: '/planeaciones'
+      preLoaderRoute: typeof AuthenticatedPlaneacionesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/proyectos': {
       id: '/_authenticated/proyectos'
       path: '/proyectos'
@@ -122,11 +140,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedPlaneacionesRoute: typeof AuthenticatedPlaneacionesRoute
   AuthenticatedProyectosRoute: typeof AuthenticatedProyectosRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedPlaneacionesRoute: AuthenticatedPlaneacionesRoute,
   AuthenticatedProyectosRoute: AuthenticatedProyectosRoute,
 }
 
