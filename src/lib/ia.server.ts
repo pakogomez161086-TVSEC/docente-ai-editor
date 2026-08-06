@@ -4,7 +4,9 @@ export const SYSTEM_PEDAGOGICO = `Eres un asistente pedagógico experto en la Nu
 Organizas siempre: Grado, Trimestre, Campo Formativo, Disciplina, Proyecto Parcial de Aula, Proyecto Académico, Productos Integradores, PDA, Saberes Disciplinares, Secuencia Didáctica, Instrumentos, Evaluación, Planeaciones y Sesiones.
 Nunca inventes contenidos oficiales que no puedas sustentar y respeta exactamente la estructura curricular. Responde SIEMPRE en español de México y SOLO con JSON válido, sin texto adicional ni bloques de código.`;
 
-export async function llamarGemini(prompt: string, systemPrompt = SYSTEM_PEDAGOGICO) {
+export type JsonIA = { [key: string]: JsonIA | JsonIA[] | string | number | boolean | null };
+
+export async function llamarGemini(prompt: string, systemPrompt = SYSTEM_PEDAGOGICO): Promise<JsonIA> {
   const key = process.env["LOVABLE_API_KEY"];
   if (!key) throw new Error("Falta la configuración de IA (LOVABLE_API_KEY).");
 
@@ -31,11 +33,11 @@ export async function llamarGemini(prompt: string, systemPrompt = SYSTEM_PEDAGOG
   const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
   const texto = data.choices?.[0]?.message?.content ?? "";
   try {
-    return JSON.parse(texto) as Record<string, unknown>;
+    return JSON.parse(texto) as JsonIA;
   } catch {
     const inicio = texto.indexOf("{");
     const fin = texto.lastIndexOf("}");
-    if (inicio >= 0 && fin > inicio) return JSON.parse(texto.slice(inicio, fin + 1)) as Record<string, unknown>;
+    if (inicio >= 0 && fin > inicio) return JSON.parse(texto.slice(inicio, fin + 1)) as JsonIA;
     throw new Error("La IA devolvió una respuesta que no se pudo interpretar.");
   }
 }
