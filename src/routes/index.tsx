@@ -36,6 +36,8 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "La plataforma más completa para docentes de Telesecundaria en México.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: Landing,
@@ -87,14 +89,14 @@ const modulos = [
 const planes = [
   {
     nombre: "Mensual",
-    precio: "$149",
-    periodo: "/mes",
+    precio: "$15",
+    periodo: " diarios · $450/mes",
     destacado: false,
     beneficios: ["Planeación ilimitada", "Generador de sesiones", "Exportación PDF y Word"],
   },
   {
     nombre: "Semestral",
-    precio: "$699",
+    precio: "$1,299",
     periodo: "/6 meses",
     destacado: true,
     beneficios: [
@@ -106,7 +108,7 @@ const planes = [
   },
   {
     nombre: "Anual",
-    precio: "$1,199",
+    precio: "$1,899",
     periodo: "/año",
     destacado: false,
     beneficios: ["Todo lo del semestral", "Respaldos automáticos", "Soporte prioritario"],
