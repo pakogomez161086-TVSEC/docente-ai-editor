@@ -1,0 +1,1 @@
+UPDATE public.planes SET precio = CASE periodo WHEN 'mensual' THEN 450.00 WHEN 'semestral' THEN 1299.00 WHEN 'anual' THEN 1899.00 ELSE precio END, precio_promocion = NULL, promocion_activa = false WHERE periodo IN ('mensual','semestral','anual');
