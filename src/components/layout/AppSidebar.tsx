@@ -4,6 +4,7 @@ import {
   CalendarDays,
   CalendarRange,
   ClipboardList,
+  CreditCard,
   LayoutDashboard,
   Library,
   NotebookPen,
@@ -40,6 +41,7 @@ const organizacion: Item[] = [
   { title: "Agenda Docente", url: "/agenda", icon: CalendarDays },
   { title: "Calendario Escolar", url: "/calendario", icon: CalendarRange },
   { title: "Biblioteca", url: "/biblioteca", icon: Library },
+  { title: "Mi suscripción", url: "/suscripcion", icon: CreditCard },
   { title: "Administración", url: "/admin", icon: Settings },
 ];
 
