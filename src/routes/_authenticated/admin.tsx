@@ -1,13 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ShieldAlert, Users } from "lucide-react";
+import { toast } from "sonner";
 
 import { DashboardShell } from "@/components/layout/DashboardShell";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+
+const MESES: Record<string, number> = { mensual: 1, semestral: 6, anual: 12 };
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -47,6 +51,62 @@ function AdminPage() {
       if (error) throw error;
       return data;
     },
+  });
+
+  const queryClient = useQueryClient();
+
+  const subs = useQuery({
+    queryKey: ["admin-suscripciones"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("suscripciones")
+        .select("id, user_id, estado, termina_en")
+        .order("inicia_en", { ascending: false });
+      if (error) throw error;
+      const porUsuario: Record<string, (typeof data)[number]> = {};
+      for (const s of data) if (!porUsuario[s.user_id]) porUsuario[s.user_id] = s;
+      return porUsuario;
+    },
+  });
+
+  const activar = useMutation({
+    mutationFn: async ({ userId, plan }: { userId: string; plan: { id: string; periodo: string; precio: number } }) => {
+      const meses = MESES[plan.periodo] ?? 1;
+      const inicio = new Date();
+      const fin = new Date(inicio);
+      fin.setMonth(fin.getMonth() + meses);
+      const { error } = await supabase.from("suscripciones").insert({
+        user_id: userId,
+        plan_id: plan.id,
+        estado: "activa",
+        inicia_en: inicio.toISOString(),
+        termina_en: fin.toISOString(),
+        monto: Number(plan.precio),
+        metodo_pago: "manual",
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Plan activado");
+      void queryClient.invalidateQueries({ queryKey: ["admin-suscripciones"] });
+    },
+    onError: (e: Error) => toast.error("No se pudo activar", { description: e.message }),
+  });
+
+  const cancelar = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("suscripciones")
+        .update({ estado: "cancelada", termina_en: new Date().toISOString() })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Suscripción cancelada");
+      void queryClient.invalidateQueries({ queryKey: ["admin-suscripciones"] });
+    },
+    onError: (e: Error) => toast.error("No se pudo cancelar", { description: e.message }),
   });
 
   if (!isAdmin) {
@@ -106,22 +166,60 @@ function AdminPage() {
                 <TableHead>Nombre</TableHead>
                 <TableHead>Correo</TableHead>
                 <TableHead>Escuela</TableHead>
-                <TableHead>Grado</TableHead>
                 <TableHead>Estado</TableHead>
+                <TableHead>Suscripción</TableHead>
+                <TableHead>Activar plan</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {(docentes.data ?? []).map((d) => (
-                <TableRow key={d.id}>
-                  <TableCell className="font-medium">{d.nombre_completo ?? "—"}</TableCell>
-                  <TableCell>{d.email}</TableCell>
-                  <TableCell>{d.escuela ?? "—"}</TableCell>
-                  <TableCell>{d.grado ?? "—"}</TableCell>
-                  <TableCell>
-                    <Badge variant={d.estado === "activo" ? "secondary" : "outline"}>{d.estado}</Badge>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {(docentes.data ?? []).map((d) => {
+                const s = subs.data?.[d.id];
+                const vigente = s && s.estado === "activa" && s.termina_en && new Date(s.termina_en) > new Date();
+                return (
+                  <TableRow key={d.id}>
+                    <TableCell className="font-medium">{d.nombre_completo ?? "—"}</TableCell>
+                    <TableCell>{d.email}</TableCell>
+                    <TableCell>{d.escuela ?? "—"}</TableCell>
+                    <TableCell>
+                      <Badge variant={d.estado === "activo" ? "secondary" : "outline"}>{d.estado}</Badge>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {vigente ? (
+                        <span>
+                          Activa hasta {new Date(s!.termina_en!).toLocaleDateString("es-MX")}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">Sin plan vigente</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1.5">
+                        {(planes.data ?? []).map((p) => (
+                          <Button
+                            key={p.id}
+                            size="sm"
+                            variant="outline"
+                            disabled={activar.isPending}
+                            onClick={() => activar.mutate({ userId: d.id, plan: p })}
+                          >
+                            {p.nombre}
+                          </Button>
+                        ))}
+                        {vigente ? (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            disabled={cancelar.isPending}
+                            onClick={() => cancelar.mutate(s!.id)}
+                          >
+                            Cancelar
+                          </Button>
+                        ) : null}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </CardContent>
