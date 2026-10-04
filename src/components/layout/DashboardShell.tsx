@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { AppSidebar } from "@/components/layout/AppSidebar";
+import { SubscriptionBanner } from "@/components/layout/SubscriptionBanner";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -64,7 +65,10 @@ export function DashboardShell({ titulo, subtitulo, acciones, children }: Props)
               <LogOut className="h-4 w-4" />
             </Button>
           </header>
-          <main className="flex-1 space-y-6 p-4 sm:p-6">{children}</main>
+          <main className="flex-1 space-y-6 p-4 sm:p-6">
+            <SubscriptionBanner />
+            {children}
+          </main>
         </div>
       </div>
     </SidebarProvider>
