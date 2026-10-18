@@ -258,6 +258,41 @@ function AdminPage() {
                 ${p.promocion_activa && p.precio_promocion != null ? p.precio_promocion : p.precio}
                 <span className="text-sm text-muted-foreground"> / {p.periodo}</span>
               </p>
+              {editandoPlan === p.id ? (
+                <div className="flex items-center gap-2 pt-2">
+                  <Input
+                    type="number"
+                    min={0}
+                    value={nuevoPrecio}
+                    onChange={(e) => setNuevoPrecio(e.target.value)}
+                    className="h-8 w-28"
+                    placeholder="Precio"
+                  />
+                  <Button
+                    size="sm"
+                    disabled={guardarPrecio.isPending || !nuevoPrecio}
+                    onClick={() => guardarPrecio.mutate({ id: p.id, precio: Number(nuevoPrecio) })}
+                  >
+                    Guardar
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setEditandoPlan(null)}>
+                    Cancelar
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mt-2 gap-1.5"
+                  onClick={() => {
+                    setEditandoPlan(p.id);
+                    setNuevoPrecio(String(p.precio));
+                  }}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  Editar precio
+                </Button>
+              )}
               <ul className="space-y-1 pt-2 text-sm text-muted-foreground">
                 {p.beneficios.map((b, i) => (
                   <li key={i}>• {b}</li>
