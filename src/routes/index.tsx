@@ -89,8 +89,8 @@ const modulos = [
 const planes = [
   {
     nombre: "Mensual",
-    precio: "$15",
-    periodo: " diarios · $450/mes",
+    precio: "$399",
+    periodo: "/mes",
     destacado: false,
     beneficios: ["Planeación ilimitada", "Generador de sesiones", "Exportación PDF y Word"],
   },
