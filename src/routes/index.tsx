@@ -89,14 +89,14 @@ const modulos = [
 const planes = [
   {
     nombre: "Mensual",
-    precio: "$15",
-    periodo: " diarios · $450/mes",
+    precio: "$399",
+    periodo: "/mes",
     destacado: false,
     beneficios: ["Planeación ilimitada", "Generador de sesiones", "Exportación PDF y Word"],
   },
   {
     nombre: "Semestral",
-    precio: "$1,299",
+    precio: "$1,199",
     periodo: "/6 meses",
     destacado: true,
     beneficios: [
@@ -108,7 +108,7 @@ const planes = [
   },
   {
     nombre: "Anual",
-    precio: "$1,899",
+    precio: "$2,999",
     periodo: "/año",
     destacado: false,
     beneficios: ["Todo lo del semestral", "Respaldos automáticos", "Soporte prioritario"],
@@ -308,6 +308,9 @@ function Landing() {
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold sm:text-4xl">Planes para cada docente</h2>
           <p className="mt-4 text-muted-foreground">Cancela cuando quieras. Precios en pesos mexicanos.</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Paga con tarjeta a meses sin intereses, SPEI, OXXO, Mercado Pago o PayPal.
+          </p>
         </div>
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
           {planes.map((p) => (

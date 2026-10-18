@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ShieldAlert, Users } from "lucide-react";
+import { Pencil, ShieldAlert, Users } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 import { DashboardShell } from "@/components/layout/DashboardShell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -92,6 +94,22 @@ function AdminPage() {
       void queryClient.invalidateQueries({ queryKey: ["admin-suscripciones"] });
     },
     onError: (e: Error) => toast.error("No se pudo activar", { description: e.message }),
+  });
+
+  const [editandoPlan, setEditandoPlan] = useState<string | null>(null);
+  const [nuevoPrecio, setNuevoPrecio] = useState("");
+
+  const guardarPrecio = useMutation({
+    mutationFn: async ({ id, precio }: { id: string; precio: number }) => {
+      const { error } = await supabase.from("planes").update({ precio }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Precio actualizado");
+      setEditandoPlan(null);
+      void queryClient.invalidateQueries({ queryKey: ["admin-planes"] });
+    },
+    onError: (e: Error) => toast.error("No se pudo actualizar el precio", { description: e.message }),
   });
 
   const cancelar = useMutation({
@@ -240,6 +258,41 @@ function AdminPage() {
                 ${p.promocion_activa && p.precio_promocion != null ? p.precio_promocion : p.precio}
                 <span className="text-sm text-muted-foreground"> / {p.periodo}</span>
               </p>
+              {editandoPlan === p.id ? (
+                <div className="flex items-center gap-2 pt-2">
+                  <Input
+                    type="number"
+                    min={0}
+                    value={nuevoPrecio}
+                    onChange={(e) => setNuevoPrecio(e.target.value)}
+                    className="h-8 w-28"
+                    placeholder="Precio"
+                  />
+                  <Button
+                    size="sm"
+                    disabled={guardarPrecio.isPending || !nuevoPrecio}
+                    onClick={() => guardarPrecio.mutate({ id: p.id, precio: Number(nuevoPrecio) })}
+                  >
+                    Guardar
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setEditandoPlan(null)}>
+                    Cancelar
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="mt-2 gap-1.5"
+                  onClick={() => {
+                    setEditandoPlan(p.id);
+                    setNuevoPrecio(String(p.precio));
+                  }}
+                >
+                  <Pencil className="h-3.5 w-3.5" />
+                  Editar precio
+                </Button>
+              )}
               <ul className="space-y-1 pt-2 text-sm text-muted-foreground">
                 {p.beneficios.map((b, i) => (
                   <li key={i}>• {b}</li>
