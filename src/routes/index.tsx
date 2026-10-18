@@ -96,7 +96,7 @@ const planes = [
   },
   {
     nombre: "Semestral",
-    precio: "$1,299",
+    precio: "$1,199",
     periodo: "/6 meses",
     destacado: true,
     beneficios: [
@@ -108,7 +108,7 @@ const planes = [
   },
   {
     nombre: "Anual",
-    precio: "$1,899",
+    precio: "$2,999",
     periodo: "/año",
     destacado: false,
     beneficios: ["Todo lo del semestral", "Respaldos automáticos", "Soporte prioritario"],
