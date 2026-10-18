@@ -96,6 +96,22 @@ function AdminPage() {
     onError: (e: Error) => toast.error("No se pudo activar", { description: e.message }),
   });
 
+  const [editandoPlan, setEditandoPlan] = useState<string | null>(null);
+  const [nuevoPrecio, setNuevoPrecio] = useState("");
+
+  const guardarPrecio = useMutation({
+    mutationFn: async ({ id, precio }: { id: string; precio: number }) => {
+      const { error } = await supabase.from("planes").update({ precio }).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Precio actualizado");
+      setEditandoPlan(null);
+      void queryClient.invalidateQueries({ queryKey: ["admin-planes"] });
+    },
+    onError: (e: Error) => toast.error("No se pudo actualizar el precio", { description: e.message }),
+  });
+
   const cancelar = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
