@@ -308,6 +308,9 @@ function Landing() {
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold sm:text-4xl">Planes para cada docente</h2>
           <p className="mt-4 text-muted-foreground">Cancela cuando quieras. Precios en pesos mexicanos.</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Paga con tarjeta a meses sin intereses, SPEI, OXXO, Mercado Pago o PayPal.
+          </p>
         </div>
         <div className="mt-12 grid gap-6 lg:grid-cols-3">
           {planes.map((p) => (
